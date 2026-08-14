@@ -20,25 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: nextjs_prisma_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/nextjs_prisma_test?schema=public
-      SESSION_SECRET: ci-session-secret-must-be-at-least-32-characters-long
-
     steps:
       - uses: actions/checkout@v4
 
@@ -63,12 +44,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
 
-      - name: Prisma generate
-        run: pnpm db:generate
-
-      - name: Apply migrations
-        run: pnpm db:deploy
-
       - name: Format check
         run: pnpm format:check
 
@@ -81,8 +56,39 @@ jobs:
       - name: Test
         run: pnpm test:coverage
 
+      # Cố tình build với biến RỖNG, không phải bỏ trống biến.
+      #
+      # Đây là cách tái hiện đúng môi trường Docker và docker-compose: `ARG` và
+      # `${VAR:-}` khi không có giá trị sẽ truyền vào chuỗi rỗng chứ không phải
+      # `undefined`. Bỏ trống ở đây thì CI xanh nhưng Docker vẫn chết — đúng
+      # tình huống đã xảy ra một lần rồi.
       - name: Build
         run: pnpm build
+        env:
+          NEXT_PUBLIC_SITE_URL: ""
+          NEXT_PUBLIC_ADSENSE_CLIENT: ""
+
+      # Lỗi SEO hỏng âm thầm: site chạy đẹp nhưng Google không vào được. Rẻ
+      # nhất là chặn ngay ở CI. Đã từng có public/robots.txt chứa `Disallow: /`
+      # che mất route src/app/robots.ts.
+      - name: Kiểm tra robots.txt không chặn bot
+        run: |
+          node .next/standalone/server.js &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:3000/ >/dev/null 2>&1 && break
+            sleep 1
+          done
+
+          echo "── robots.txt ──"
+          curl -fsS http://127.0.0.1:3000/robots.txt | tee /tmp/robots.txt
+
+          if grep -qi '^Disallow: /$' /tmp/robots.txt; then
+            echo "::error::robots.txt đang chặn toàn bộ site. Kiểm tra file tĩnh trong public/ có đè lên src/app/robots.ts không."
+            exit 1
+          fi
+
+          echo "── sitemap.xml ──"
+          curl -fsS http://127.0.0.1:3000/sitemap.xml | grep -c '<loc>'
 
   audit:
     name: Dependency audit
@@ -95,6 +101,8 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Audit production dependencies
         run: pnpm audit --prod --audit-level high
 
@@ -105,11 +113,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
+
       # Dockerfile hỏng chỉ lộ ra lúc deploy nếu CI không tự build thử.
+      # `load: true` để bước sau chạy được image vừa build.
       - uses: docker/build-push-action@v6
         with:
           context: .
           target: runner
           push: false
+          load: true
+          tags: congcu:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Build xong KHÔNG có nghĩa là chạy được.
+      #
+      # Đã từng gặp: image build sạch nhưng container vừa lên là chết với
+      # MODULE_NOT_FOUND, do Next.js truy vết thiếu file vào bản standalone.
+      # Loại lỗi này chỉ lộ ra khi chạy thật, nên bước dưới đây là bắt buộc.
+      - name: Chạy thử container
+        run: |
+          docker run -d --name congcu-ci -p 3000:3000 congcu:ci
+
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:3000/ >/dev/null 2>&1 && ok=1 && break
+            sleep 2
+          done
+
+          if [ "${ok:-0}" != "1" ]; then
+            echo "::error::Container không phục vụ được sau 60 giây."
+            docker logs congcu-ci
+            exit 1
+          fi
+
+          echo "✓ Container phục vụ bình thường"
+          curl -fsS http://127.0.0.1:3000/robots.txt
+          docker rm -f congcu-ci

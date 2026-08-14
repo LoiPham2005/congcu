@@ -19,7 +19,12 @@ const envSchema = z.object({
    * Bắt buộc đúng vì nó đi vào `sitemap.xml`, thẻ canonical và Open Graph —
    * ba chỗ mà một giá trị sai sẽ âm thầm phá SEO thay vì báo lỗi.
    */
-  NEXT_PUBLIC_SITE_URL: z.url().default("http://localhost:3000"),
+  // Cùng lý do với NEXT_PUBLIC_ADSENSE_CLIENT bên dưới: `.default()` chỉ nhảy
+  // vào khi giá trị là `undefined`, còn Docker truyền chuỗi rỗng.
+  NEXT_PUBLIC_SITE_URL: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.url().default("http://localhost:3000"),
+  ),
 
   /**
    * Mã publisher AdSense, dạng `ca-pub-xxxxxxxxxxxxxxxx`.
@@ -27,11 +32,20 @@ const envSchema = z.object({
    * Để trống thì toàn bộ khối quảng cáo tự tắt. Có chủ đích: giai đoạn đầu
    * chưa được duyệt AdSense, và chạy script quảng cáo khi chưa có mã chỉ làm
    * trang chậm đi chứ không mang lại gì.
+   *
+   * `preprocess` quy chuỗi rỗng về `undefined` — không phải chuyện làm cho
+   * đẹp. `.optional()` chỉ chấp nhận `undefined`, trong khi `ARG` của Docker
+   * và `${VAR:-}` của docker-compose khi không có giá trị sẽ truyền vào chuỗi
+   * RỖNG. Thiếu dòng này thì build trên máy dev chạy ngon (biến không tồn tại)
+   * nhưng build trong Docker và CI chết ở bước thu thập dữ liệu trang.
    */
-  NEXT_PUBLIC_ADSENSE_CLIENT: z
-    .string()
-    .regex(/^ca-pub-\d{16}$/, "NEXT_PUBLIC_ADSENSE_CLIENT phải có dạng ca-pub-<16 chữ số>")
-    .optional(),
+  NEXT_PUBLIC_ADSENSE_CLIENT: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z
+      .string()
+      .regex(/^ca-pub-\d{16}$/, "NEXT_PUBLIC_ADSENSE_CLIENT phải có dạng ca-pub-<16 chữ số>")
+      .optional(),
+  ),
 });
 
 export type Env = z.infer<typeof envSchema>;

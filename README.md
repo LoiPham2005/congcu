@@ -102,4 +102,4 @@ Cả hai đều chỉ dựng một tiến trình Node phục vụ HTML đã buil
 - [ ] Cài tiện ích chặn quảng cáo trên trình duyệt dùng để test — tự bấm vào quảng cáo của mình
       là bị khoá tài khoản vĩnh viễn
 
-Kế hoạch tổng thể và bảng từ khoá: xem `../KE_HOACH_ADSENSE_ADMOB.md` và `../TU_KHOA_CONG_CU.md`.
+Kế hoạch tổng thể và bảng từ khoá: xem `docs/KE_HOACH_ADSENSE_ADMOB.md` và `docs/TU_KHOA_CONG_CU.md`.
