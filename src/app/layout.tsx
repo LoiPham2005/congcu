@@ -34,8 +34,21 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const adsenseClient = env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
+  /*
+   * `suppressHydrationWarning` dưới đây chỉ áp cho THUỘC TÍNH CỦA CHÍNH thẻ
+   * <html>, không lan xuống thẻ con — mọi lệch hydrate thật trong nội dung vẫn
+   * được báo bình thường.
+   *
+   * Lý do cần: tiện ích mở rộng trên trình duyệt hay chèn class vào thẻ <html>
+   * trước khi React kịp hydrate (dark mode, đổi giao diện, trình đọc…). React
+   * so với HTML server gửi xuống thấy lệch nên cảnh báo, dù chẳng có gì sai
+   * trong mã nguồn.
+   *
+   * An toàn ở đây vì ta không đặt bất kỳ thuộc tính động nào lên <html> — chỉ
+   * có `lang="vi"` cố định.
+   */
   return (
-    <html lang="vi">
+    <html lang="vi" suppressHydrationWarning>
       <body>
         <SiteHeader />
         <div className="site-main">{children}</div>
