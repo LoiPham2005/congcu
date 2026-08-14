@@ -4,7 +4,7 @@
 # Kết quả là một container Node duy nhất phục vụ HTML đã dựng sẵn — chạy được
 # trên VPS rẻ nhất, và chi phí không tăng theo lượng truy cập vì mọi công cụ
 # tính toán ngay trên trình duyệt người dùng.
-FROM node:24-alpine AS base
+FROM node:26-alpine AS base
 ENV PNPM_HOME=/pnpm \
     PATH=/pnpm:$PATH \
     COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
