@@ -1,0 +1,31 @@
+# Chỉ một service: site không có database, không có tiến trình phụ.
+#
+# NEXT_PUBLIC_* phải truyền vào lúc BUILD (qua `args`) chứ không phải lúc chạy
+# (qua `environment`) — Next.js nhúng thẳng chúng vào bundle JavaScript, nên
+# đặt ở `environment` sẽ không có tác dụng gì.
+services:
+  web:
+    build:
+      context: .
+      target: runner
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+        NEXT_PUBLIC_ADSENSE_CLIENT: ${NEXT_PUBLIC_ADSENSE_CLIENT:-}
+    image: congcu-web
+    container_name: congcu_web
+    restart: unless-stopped
+    ports:
+      # Chỉ mở trên loopback: Caddy hoặc nginx ở phía trước lo TLS và tên miền.
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3

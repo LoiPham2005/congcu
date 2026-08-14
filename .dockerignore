@@ -1,0 +1,23 @@
+.git
+.github
+node_modules
+**/node_modules
+.next
+**/.next
+dist
+coverage
+*.tsbuildinfo
+
+# Không bao giờ đưa secret vào image
+.env
+.env.*
+!.env.example
+
+*.md
+!README.md
+.vscode
+.idea
+.DS_Store
+Makefile
+docker-compose.yml
+Dockerfile

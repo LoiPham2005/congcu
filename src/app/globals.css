@@ -1,0 +1,487 @@
+/*
+ * Tailwind CSS v4 (cấu hình bằng CSS, không cần tailwind.config.js).
+ * Các class thủ công bên dưới dùng được ngay; Tailwind là tuỳ chọn thêm.
+ *
+ * ---
+ * VÌ SAO GIAO DIỆN SÁNG
+ *
+ * Bản gốc trong `nextjs_base` dùng nền tối. Ở đây đổi sang nền sáng có chủ đích:
+ * quảng cáo AdSense được nhà quảng cáo thiết kế trên nền trắng, nên đặt trên
+ * nền tối chúng nổi lên như miếng vá và tỷ lệ nhấp giảm. Với site sống bằng
+ * quảng cáo thì đó là mất doanh thu, không phải chuyện thẩm mỹ.
+ */
+@import "tailwindcss";
+
+:root {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --bg-color: #f8fafc;
+  --surface-color: #ffffff;
+  --surface-muted: #f1f5f9;
+  --border-color: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --primary-color: #1d4ed8;
+  --primary-hover: #1e40af;
+  --primary-soft: #eff6ff;
+  --success-color: #047857;
+  --success-soft: #ecfdf5;
+  --warning-color: #b45309;
+  --warning-soft: #fffbeb;
+  --danger-color: #b91c1c;
+  --danger-soft: #fef2f2;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+/* ---------- Bố cục ---------- */
+
+.container {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.site-main {
+  flex: 1;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* ---------- Header & Footer ---------- */
+
+.site-header {
+  background: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.site-header__inner {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.site-header__brand {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.site-header__brand:hover {
+  text-decoration: none;
+  color: var(--primary-color);
+}
+
+.site-header__nav {
+  display: flex;
+  gap: 18px;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.site-footer {
+  background: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  margin-top: 48px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.site-footer__inner {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.site-footer__links {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Thẻ nội dung ---------- */
+
+.card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card--muted {
+  background: var(--surface-muted);
+  box-shadow: none;
+}
+
+.tool-card {
+  display: block;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  color: inherit;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.tool-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+  color: inherit;
+}
+
+.tool-card__name {
+  font-weight: 700;
+  font-size: 1.02rem;
+  margin-bottom: 6px;
+  color: var(--text-main);
+}
+
+.tool-card__desc {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* ---------- Form ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.field__hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--surface-color);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+  border-color: var(--primary-color);
+}
+
+.textarea {
+  min-height: 160px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-ghost {
+  background: var(--surface-color);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+.btn-ghost:hover {
+  background: var(--surface-muted);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+/* ---------- Kết quả & thông báo ---------- */
+
+.result {
+  background: var(--success-soft);
+  border: 1px solid #a7f3d0;
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.result__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--success-color);
+  margin-bottom: 6px;
+}
+
+.result__value {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.alert-error {
+  background: var(--danger-soft);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  color: var(--danger-color);
+  font-size: 0.9rem;
+}
+
+.note {
+  background: var(--warning-soft);
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 0.87rem;
+  color: var(--warning-color);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.stat__label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.stat__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__unit {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 3px;
+}
+
+/* ---------- Nội dung hướng dẫn ---------- */
+
+.prose {
+  color: var(--text-main);
+}
+
+.prose h2 {
+  font-size: 1.25rem;
+  margin: 28px 0 10px;
+}
+
+.prose h3 {
+  font-size: 1.05rem;
+  margin: 20px 0 8px;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin-bottom: 12px;
+  color: var(--text-muted);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 22px;
+}
+
+.prose li {
+  margin-bottom: 4px;
+}
+
+.prose strong {
+  color: var(--text-main);
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--surface-muted);
+  padding: 2px 5px;
+  border-radius: var(--radius-sm);
+}
+
+.breadcrumb {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.page-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.page-lead {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.section-desc {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+}
+
+/* ---------- Quảng cáo ---------- */
+
+/*
+ * `min-height` được đặt sẵn từ component để giữ chỗ trước khi quảng cáo nạp
+ * xong — xem ghi chú về CLS trong `src/components/ads/ad-slot.tsx`.
+ */
+.ad-slot {
+  margin: 24px 0;
+  overflow: hidden;
+}
+
+/* Khung giữ chỗ khi chưa cấu hình AdSense: chiếm đúng chỗ nhưng không nhìn thấy. */
+.ad-slot--trong {
+  visibility: hidden;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 24px 16px;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 18px;
+  }
+}
